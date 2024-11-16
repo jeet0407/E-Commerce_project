@@ -152,6 +152,107 @@ bool isValidPhone(const string& phone) {
 }
 
 
-int main(){
-    
+int main() {
+    while (true) {
+        cout << "\n=== E-commerce System ===\n";
+        cout << "1. Sign Up\n2. Login\n3. Exit\nChoose an option: ";
+
+        int choice;
+        cin >> choice;
+        cin.ignore();
+
+        if (choice == 1) {
+            cout << "\n=== Sign Up ===\n";
+            cout << "1. Buyer\n2. Seller\n3. Admin\nChoose user type: ";
+            int userType;
+            cin >> userType;
+            cin.ignore();
+
+            string username, password, email, fullName, phoneNumber;
+
+            cout << "Enter username: ";
+            getline(cin, username);
+            if (FileHandler::doesUserExist(username)) {
+                cout << "Username already exists!\n";
+                continue;
+            }
+
+            cout << "Enter password (min 6 characters): ";
+            getline(cin, password);
+            if (!isValidPassword(password)) {
+                cout << "Invalid password!\n";
+                continue;
+            }
+
+            cout << "Enter email: ";
+            getline(cin, email);
+            if (!isValidEmail(email)) {
+                cout << "Invalid email format!\n";
+                continue;
+            }
+
+            cout << "Enter full name: ";
+            getline(cin, fullName);
+
+            cout << "Enter phone number (10 digits): ";
+            getline(cin, phoneNumber);
+            if (!isValidPhone(phoneNumber)) {
+                cout << "Invalid phone number!\n";
+                continue;
+            }
+
+            User* newUser = nullptr;
+            switch (userType) {
+                case 1: newUser = new Buyer(username, password, email, fullName, phoneNumber); break;
+                case 2: newUser = new Seller(username, password, email, fullName, phoneNumber); break;
+                case 3: newUser = new Admin(username, password, email, fullName, phoneNumber); break;
+                default: 
+                    cout << "Invalid user type!\n";
+                    continue;
+            }
+
+            newUser->saveToFile();
+            cout << "Registration successful!\n";
+            delete newUser;
+
+        } else if (choice == 2) {
+            cout << "\n=== Login ===\n";
+            string username, password;
+
+            cout << "Enter username: ";
+            getline(cin, username);
+            cout << "Enter password: ";
+            getline(cin, password);
+
+            User* user = User::login(username, password);
+            if (user) {
+                cout << "Login successful!\n";
+
+                if (dynamic_cast<Buyer*>(user)) {
+                    cout << "Welcome Buyer: " << username << endl;
+                } else if (dynamic_cast<Seller*>(user)) {
+                    cout << "Welcome Seller: " << username << endl;
+                } else if (Admin* admin = dynamic_cast<Admin*>(user)) {
+                    cout << "Welcome Admin: " << username << endl;
+                    cout << "1. View All Users\n2. View All Transactions\nChoose an option: ";
+                    int adminChoice;
+                    cin >> adminChoice;
+                    cin.ignore();
+
+                    if (adminChoice == 1) admin->viewAllUsers();
+                    else if (adminChoice == 2) admin->viewAllTransactions();
+                }
+                delete user;
+            } else {
+                cout << "Invalid username or password.\n";
+            }
+        } else if (choice == 3) {
+            cout << "Goodbye!\n";
+            break;
+        } else {
+            cout << "Invalid choice! Try again.\n";
+        }
+    }
+
+    return 0;
 }

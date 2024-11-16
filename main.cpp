@@ -84,6 +84,73 @@ public:
     }
 };
 
+class Admin : public User {
+public:
+    Admin(string uname, string pwd, string mail, string name, string phone)
+        : User(uname, pwd, mail, name, phone, "admin") {}
+
+    void viewAllUsers() {
+        ifstream file(USERS_FILE);
+        string line;
+        cout << "\nAll Users:\n";
+        while (getline(file, line)) {
+            cout << line << endl;
+        }
+        file.close();
+    }
+
+    void viewAllTransactions() {
+        ifstream file(TRANSACTIONS_FILE);
+        string line;
+        cout << "\nAll Transactions:\n";
+        while (getline(file, line)) {
+            cout << line << endl;
+        }
+        file.close();
+    }
+};
+
+// Static method implementation for User login
+User* User::login(const string& username, const string& password) {
+    ifstream file(USERS_FILE);
+    string line;
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string uname, pwd, email, type, name, phone;
+        
+        getline(ss, uname, ',');
+        getline(ss, pwd, ',');
+        getline(ss, email, ',');
+        getline(ss, type, ',');
+        getline(ss, name, ',');
+        getline(ss, phone, ',');
+
+        if (uname == username && pwd == password) {
+            if (type == "buyer")
+                return new Buyer(uname, pwd, email, name, phone);
+            else if (type == "seller")
+                return new Seller(uname, pwd, email, name, phone);
+            else if (type == "admin")
+                return new Admin(uname, pwd, email, name, phone);
+        }
+    }
+    return nullptr;
+}
+
+// Helper functions for input validation
+bool isValidEmail(const string& email) {
+    return email.find('@') != string::npos && email.find('.') != string::npos;
+}
+
+bool isValidPassword(const string& password) {
+    return password.length() >= 6;
+}
+
+bool isValidPhone(const string& phone) {
+    return phone.length() == 10 && phone.find_first_not_of("0123456789") == string::npos;
+}
+
 
 int main(){
     

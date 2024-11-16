@@ -40,6 +40,50 @@ public:
     }
 };
 
+// Base User class
+class User {
+protected:
+    string username;
+    string password;
+    string email;
+    string fullName;
+    string phoneNumber;
+    string userType;
+
+public:
+    User(string uname, string pwd, string mail, string name, string phone, string type)
+        : username(uname), password(pwd), email(mail), fullName(name), phoneNumber(phone), userType(type) {}
+
+    virtual void saveToFile() {
+        string userData = username + "," + password + "," + email + "," + userType + "," + fullName + "," + phoneNumber;
+        FileHandler::saveToFile(USERS_FILE, userData);
+    }
+
+    static User* login(const string& username, const string& password);
+};
+
+class Buyer : public User {
+public:
+    Buyer(string uname, string pwd, string mail, string name, string phone)
+        : User(uname, pwd, mail, name, phone, "buyer") {}
+
+    void saveOrder(const string& orderDetails) {
+        string orderData = username + "," + orderDetails + "," + to_string(time(0));
+        FileHandler::saveToFile(ORDERS_FILE, orderData);
+    }
+};
+
+class Seller : public User {
+public:
+    Seller(string uname, string pwd, string mail, string name, string phone)
+        : User(uname, pwd, mail, name, phone, "seller") {}
+
+    void addProduct(const string& productName, double price, int quantity) {
+        string productData = username + "," + productName + "," + to_string(price) + "," + to_string(quantity);
+        FileHandler::saveToFile(PRODUCTS_FILE, productData);
+    }
+};
+
 
 int main(){
     

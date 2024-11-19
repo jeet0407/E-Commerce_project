@@ -8,3 +8,4 @@ buyer,nothing,5,1732039478
 buyer,nothing,5,1732040974
 buyer,nothing,10,1732041463
 buyer,nothing,2,1732043774
+buyer,nothing,2,1732045510,ajula,Gujarat

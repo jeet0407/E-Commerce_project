@@ -62,16 +62,75 @@ public:
     static User* login(const string& username, const string& password);
 };
 
+//Buyer
+
 class Buyer : public User {
 public:
     Buyer(string uname, string pwd, string mail, string name, string phone)
         : User(uname, pwd, mail, name, phone, "buyer") {}
 
-    void saveOrder(const string& orderDetails) {
-        string orderData = username + "," + orderDetails + "," + to_string(time(0));
-        FileHandler::saveToFile(ORDERS_FILE, orderData);
+    void viewAvailableProducts() {
+        ifstream file(PRODUCTS_FILE);
+        string line;
+        cout << "\nAvailable Products:\n";
+        while (getline(file, line)) {
+            stringstream ss(line);
+            string seller, product, price, quantity;
+            getline(ss, seller, ',');
+            getline(ss, product, ',');
+            getline(ss, price, ',');
+            getline(ss, quantity, ',');
+
+            if (stoi(quantity) > 0) { // Only display products with stock
+                cout << "Product: " << product
+                     << " | Price: " << price
+                     << " | Quantity: " << quantity
+                     << " | Sold by: " << seller << "\n";
+            }
+        }
+        file.close();
+    }
+
+    void placeOrder(const string& productName, int quantity) {
+        ifstream file(PRODUCTS_FILE);
+        ofstream tempFile("temp.txt");
+        string line;
+        bool found = false;
+
+        while (getline(file, line)) {
+            stringstream ss(line);
+            string seller, product, price, stock;
+            getline(ss, seller, ',');
+            getline(ss, product, ',');
+            getline(ss, price, ',');
+            getline(ss, stock, ',');
+
+            if (product == productName && stoi(stock) >= quantity) {
+                found = true;
+                int remainingStock = stoi(stock) - quantity;
+                tempFile << seller << "," << product << "," << price << "," << remainingStock << endl;
+
+                // Save the order
+                string orderData = username + "," + product + "," + to_string(quantity) + "," + to_string(time(0));
+                FileHandler::saveToFile(ORDERS_FILE, orderData);
+                cout << "Order placed successfully for " << quantity << " unit(s) of \"" << productName << "\".\n";
+            } else {
+                tempFile << line << endl;
+            }
+        }
+        file.close();
+        tempFile.close();
+
+        remove(PRODUCTS_FILE.c_str());
+        rename("temp.txt", PRODUCTS_FILE.c_str());
+
+        if (!found) {
+            cout << "Product not found or insufficient stock.\n";
+        }
     }
 };
+
+//Seller
 
 class Seller : public User {
 public:
@@ -81,8 +140,122 @@ public:
     void addProduct(const string& productName, double price, int quantity) {
         string productData = username + "," + productName + "," + to_string(price) + "," + to_string(quantity);
         FileHandler::saveToFile(PRODUCTS_FILE, productData);
+        cout << "Product \"" << productName << "\" added successfully.\n";
+    }
+
+    void editProduct(const string& productName, double newPrice, int newQuantity) {
+        // Step 1: Check if the product exists for this seller
+        ifstream file(PRODUCTS_FILE);
+        string line;
+        bool productExists = false;
+
+        while (getline(file, line)) {
+            stringstream ss(line);
+            string seller, product, price, quantity;
+            getline(ss, seller, ',');
+            getline(ss, product, ',');
+            getline(ss, price, ',');
+            getline(ss, quantity, ',');
+
+            if (seller == username && product == productName) {
+                productExists = true;
+                break;
+            }
+        }
+        file.close();
+
+        // Step 2: If product exists, proceed with updating it
+        if (productExists) {
+            ifstream file(PRODUCTS_FILE);
+            ofstream tempFile("temp.txt");
+            bool updated = false;
+
+            while (getline(file, line)) {
+                stringstream ss(line);
+                string seller, product, price, quantity;
+                getline(ss, seller, ',');
+                getline(ss, product, ',');
+                getline(ss, price, ',');
+                getline(ss, quantity, ',');
+
+                if (seller == username && product == productName) {
+                    tempFile << seller << "," << product << "," << newPrice << "," << newQuantity << endl;
+                    updated = true;
+                } else {
+                    tempFile << line << endl;
+                }
+            }
+            file.close();
+            tempFile.close();
+
+            remove(PRODUCTS_FILE.c_str());
+            rename("temp.txt", PRODUCTS_FILE.c_str());
+
+            if (updated) {
+                cout << "Product \"" << productName << "\" updated successfully.\n";
+            }
+        } else {
+            cout << "Product \"" << productName << "\" not found for the seller \"" << username << "\".\n";
+        }
+    }
+
+
+    void deleteProduct(const string& productName) {
+        ifstream file(PRODUCTS_FILE);
+        ofstream tempFile("temp.txt");
+        string line;
+        bool found = false;
+
+        while (getline(file, line)) {
+            stringstream ss(line);
+            string seller, product, price, quantity;
+            getline(ss, seller, ',');
+            getline(ss, product, ',');
+            getline(ss, price, ',');
+            getline(ss, quantity, ',');
+
+            if (seller == username && product == productName) {
+                found = true;
+            } else {
+                tempFile << line << endl;
+            }
+        }
+        file.close();
+        tempFile.close();
+
+        remove(PRODUCTS_FILE.c_str());
+        rename("temp.txt", PRODUCTS_FILE.c_str());
+
+        if (found) {
+            cout << "Product \"" << productName << "\" deleted successfully.\n";
+        } else {
+            cout << "Product not found!\n";
+        }
+    }
+
+    void viewListedProducts() {
+        ifstream file(PRODUCTS_FILE);
+        string line;
+        cout << "\nYour Listed Products:\n";
+        while (getline(file, line)) {
+            stringstream ss(line);
+            string seller, product, price, quantity;
+            getline(ss, seller, ',');
+            getline(ss, product, ',');
+            getline(ss, price, ',');
+            getline(ss, quantity, ',');
+
+            if (seller == username) {
+                cout << "Product: " << product
+                     << " | Price: " << price
+                     << " | Quantity: " << quantity << "\n";
+            }
+        }
+        file.close();
     }
 };
+
+//Admin
 
 class Admin : public User {
 public:
@@ -150,7 +323,6 @@ bool isValidPassword(const string& password) {
 bool isValidPhone(const string& phone) {
     return phone.length() == 10 && phone.find_first_not_of("0123456789") == string::npos;
 }
-
 
 int main() {
     while (true) {
@@ -228,24 +400,147 @@ int main() {
             if (user) {
                 cout << "Login successful!\n";
 
-                if (dynamic_cast<Buyer*>(user)) {
-                    cout << "Welcome Buyer: " << username << endl;
-                } else if (dynamic_cast<Seller*>(user)) {
-                    cout << "Welcome Seller: " << username << endl;
-                } else if (Admin* admin = dynamic_cast<Admin*>(user)) {
-                    cout << "Welcome Admin: " << username << endl;
-                    cout << "1. View All Users\n2. View All Transactions\nChoose an option: ";
-                    int adminChoice;
-                    cin >> adminChoice;
-                    cin.ignore();
+                if (Buyer* buyer = dynamic_cast<Buyer*>(user)) {
+                    while (true) {
+                        cout << "\n1. View Available Products\n"
+                             << "2. Place Order\n"
+                             << "3. Logout\n"
+                             << "Choose an option: ";
+                        int buyerChoice;
+                        cin >> buyerChoice;
+                        cin.ignore();
 
-                    if (adminChoice == 1) admin->viewAllUsers();
-                    else if (adminChoice == 2) admin->viewAllTransactions();
+                        if (buyerChoice == 1) {
+                            buyer->viewAvailableProducts();
+                        } else if (buyerChoice == 2) {
+                            string productName;
+                            int quantity;
+
+                            cout << "Enter product name: ";
+                            getline(cin, productName);
+                            cout << "Enter quantity: ";
+                            cin >> quantity;
+                            cin.ignore();
+
+                            buyer->placeOrder(productName, quantity);
+                        } else if (buyerChoice == 3) {
+                            cout << "Logging out...\n";
+                            break;
+                        } else {
+                            cout << "Invalid choice! Try again.\n";
+                        }
+                    }
+
+                } else if (Seller* seller = dynamic_cast<Seller*>(user)) {
+                    while (true) {
+                        cout << "\n1. Add Product\n"
+                             << "2. Edit Product\n"
+                             << "3. Delete Product\n"
+                             << "4. View Listed Products\n"
+                             << "5. Logout\n"
+                             << "Choose an option: ";
+                        int sellerChoice;
+                        cin >> sellerChoice;
+                        cin.ignore();
+
+                        if (sellerChoice == 1) {
+                            string productName;
+                            double price;
+                            int quantity;
+
+                            cout << "Enter product name: ";
+                            getline(cin, productName);
+                            cout << "Enter price: ";
+                            cin >> price;
+                            cout << "Enter quantity: ";
+                            cin >> quantity;
+                            cin.ignore();
+
+                            seller->addProduct(productName, price, quantity);
+                        } else if (sellerChoice == 2) {
+                            string productName;
+                            double newPrice;
+                            int newQuantity;
+
+                            cout << "Enter product name to edit: ";
+                            getline(cin, productName);
+
+                            // Check if the product exists
+                            ifstream file(PRODUCTS_FILE);
+                            string line;
+                            bool productExists = false;
+
+                            while (getline(file, line)) {
+                                stringstream ss(line);
+                                string seller, product, price, quantity;
+                                getline(ss, seller, ',');
+                                getline(ss, product, ',');
+
+                                if (seller == username && product == productName) {
+                                    productExists = true;
+                                    break;
+                                }
+                            }
+                            file.close();
+
+                            if (productExists) {
+                                cout << "Enter new price: ";
+                                cin >> newPrice;
+                                cout << "Enter new quantity: ";
+                                cin >> newQuantity;
+                                cin.ignore();
+
+                                seller->editProduct(productName, newPrice, newQuantity);
+                            } else {
+                                cout << "Oops!!! No such product exists.\n";
+                            }
+                        }
+
+                        else if (sellerChoice == 3) {
+                            string productName;
+
+                            cout << "Enter product name to delete: ";
+                            getline(cin, productName);
+
+                            seller->deleteProduct(productName);
+                        } else if (sellerChoice == 4) {
+                            seller->viewListedProducts();
+                        } else if (sellerChoice == 5) {
+                            cout << "Logging out...\n";
+                            break;
+                        } else {
+                            cout << "Invalid choice! Try again.\n";
+                        }
+                    }
+
+                } else if (Admin* admin = dynamic_cast<Admin*>(user)) {
+                    while (true) {
+                        cout << "\n1. View All Users\n"
+                             << "2. View All Transactions\n"
+                             << "3. Logout\n"
+                             << "Choose an option: ";
+                        int adminChoice;
+                        cin >> adminChoice;
+                        cin.ignore();
+
+                        if (adminChoice == 1) {
+                            admin->viewAllUsers();
+                        } else if (adminChoice == 2) {
+                            admin->viewAllTransactions();
+                        } else if (adminChoice == 3) {
+                            cout << "Logging out...\n";
+                            break;
+                        } else {
+                            cout << "Invalid choice! Try again.\n";
+                        }
+                    }
                 }
                 delete user;
+
             } else {
                 cout << "Invalid username or password.\n";
             }
+
         } else if (choice == 3) {
             cout << "Goodbye!\n";
             break;

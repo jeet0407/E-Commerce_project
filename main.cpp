@@ -4,7 +4,10 @@
 #include <vector>
 #include <string>
 #include <ctime>
-
+#include <iomanip>
+#include <bits/stdc++.h>
+#include <chrono>
+#include <cctype>
 using namespace std;
 
 // File paths for data storage
@@ -12,6 +15,7 @@ const string USERS_FILE = "users.txt";
 const string PRODUCTS_FILE = "products.txt";
 const string ORDERS_FILE = "orders.txt";
 const string TRANSACTIONS_FILE = "transactions.txt";
+const string COUPONS_FILE = "coupons.txt";
 
 // Utility class for handling file operations
 class FileHandler {
@@ -62,6 +66,20 @@ public:
     static User* login(const string& username, const string& password);
 };
 
+string trim(const string& str) {
+    size_t first = str.find_first_not_of(' '); 
+    if (first == string::npos) return ""; // No non-space characters
+    size_t last = str.find_last_not_of(' ');
+    return str.substr(first, (last - first + 1));
+}
+
+// Function to convert string to lowercase (for case-insensitive comparison)
+string toLower(const string& str) {
+    string lowerStr = str;
+    transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
+    return lowerStr;
+}
+
 //Buyer
 
 class Buyer : public User {
@@ -91,43 +109,181 @@ public:
         file.close();
     }
 
-    void placeOrder(const string& productName, int quantity) {
-        ifstream file(PRODUCTS_FILE);
-        ofstream tempFile("temp.txt");
-        string line;
-        bool found = false;
+    void waitForSeconds(int seconds) {
+    time_t startTime = time(0);
+    while (difftime(time(0), startTime) < seconds) {
+        // Busy-waiting loop to simulate delay
+    }
+}
+    void displayPaymentOptions() {
+    cout << "\nChoose a payment method:\n";
+    cout << "1. Card Payment\n";
+    cout << "2. UPI\n";
+    cout << "Enter your choice: ";
+}
 
-        while (getline(file, line)) {
-            stringstream ss(line);
-            string seller, product, price, stock;
-            getline(ss, seller, ',');
-            getline(ss, product, ',');
-            getline(ss, price, ',');
-            getline(ss, stock, ',');
+void processCardPayment() {
+    string cardNumber, cardHolderName;
+    cout << "\nEnter Card Number: ";
+    cin >> cardNumber;
+    cout << "Enter Card Holder Name: ";
+    cin.ignore();
+    getline(cin, cardHolderName);
+    
+    cout << "Your payment will be redirected in 10 seconds...\n";
+    waitForSeconds(5);
 
-            if (product == productName && stoi(stock) >= quantity) {
-                found = true;
-                int remainingStock = stoi(stock) - quantity;
-                tempFile << seller << "," << product << "," << price << "," << remainingStock << endl;
+    cout << "Processing payment...\n";
+    waitForSeconds(5); // Simulate a delay for payment processing
+    cout << "Payment successful!\n";
+}
 
-                // Save the order
-                string orderData = username + "," + product + "," + to_string(quantity) + "," + to_string(time(0));
-                FileHandler::saveToFile(ORDERS_FILE, orderData);
-                cout << "Order placed successfully for " << quantity << " unit(s) of \"" << productName << "\".\n";
-            } else {
-                tempFile << line << endl;
+void processUPIPayment() {
+    string upiID;
+    cout << "\nEnter UPI ID: ";
+    cin >> upiID;
+
+    cout << "Your payment will be redirected in 10 seconds...\n";
+    waitForSeconds(5);
+
+    cout << "Processing payment...\n";
+    waitForSeconds(5); // Simulate a delay for payment processing
+    cout << "Payment successful!\n";
+}
+
+bool applyCoupon(const string& enteredCoupon, float& discountRate) {
+    ifstream file(COUPONS_FILE);
+    string line;
+    if (!file.is_open()) {
+    cout << "Error: Could not open the coupons file!" << endl;
+    return false;
+}
+
+
+    // Read the first (and only) line from the file
+    if (getline(file, line)) {
+        // Trim any extra spaces and convert entered coupon to lowercase
+        string trimmedEnteredCoupon = toLower(trim(enteredCoupon));
+
+        // Split the line by commas
+        stringstream ss(line);
+        string coupon;
+
+        while (getline(ss, coupon, ',')) {
+            // Trim any extra spaces in coupon from file and convert to lowercase
+            string trimmedCoupon = toLower(trim(coupon));
+
+            // Compare the entered coupon with the coupons in the file (case-insensitive)
+            if (trimmedCoupon == trimmedEnteredCoupon) {
+                // Apply a random discount between 15% and 20%
+                discountRate = (rand() % 6 + 15) / 100.0; // Random discount between 15% and 20%
+                return true; // Coupon found, discount applied
             }
         }
-        file.close();
-        tempFile.close();
+    }
+    return false; // Coupon not found
+}
 
-        remove(PRODUCTS_FILE.c_str());
-        rename("temp.txt", PRODUCTS_FILE.c_str());
+void generateBill(const string& productName, int quantity, float pricePerUnit, float discountRate) {
+    float totalAmount = pricePerUnit * quantity;
+    float discountAmount = totalAmount * discountRate;
+    float subTotal = totalAmount - discountAmount;
+    float cgst = subTotal * 0.09; // 9% CGST
+    float sgst = subTotal * 0.09; // 9% SGST
+    float finalAmount = subTotal + cgst + sgst;
 
-        if (!found) {
-            cout << "Product not found or insufficient stock.\n";
+    cout << fixed << setprecision(2);
+    cout << "\n--- BILL ---\n";
+    cout << "Product Name: " << productName << "\n";
+    cout << "Quantity: " << quantity << "\n";
+    cout << "Price per Unit: " << pricePerUnit << "\n";
+    cout << "Total Amount: " << totalAmount << "\n";
+    cout << "Discount Applied: " << discountAmount << " (" << discountRate * 100 << "%)\n";
+    cout << "Subtotal after Discount: " << subTotal << "\n";
+    cout << "CGST (9%): " << cgst << "\n";
+    cout << "SGST (9%): " << sgst << "\n";
+    cout << "Final Amount to Pay: " << finalAmount << "\n";
+    cout << "-------------------\n";
+
+    // Save transaction details to file
+    ofstream transactionFile(TRANSACTIONS_FILE, ios::app);
+    transactionFile << "User," << productName << "," << quantity << "," << finalAmount << "," << time(0) << endl;
+    transactionFile.close();
+}
+
+void placeOrder(const string& username, const string& productName, int quantity) {
+    ifstream file(PRODUCTS_FILE);
+    ofstream tempFile("temp.txt");
+    string line;
+    bool found = false;
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string seller, product, price, stock;
+        getline(ss, seller, ',');
+        getline(ss, product, ',');
+        getline(ss, price, ',');
+        getline(ss, stock, ',');
+
+        if (product == productName && stoi(stock) >= quantity) {
+            found = true;
+            int remainingStock = stoi(stock) - quantity;
+            tempFile << seller << "," << product << "," << price << "," << remainingStock << endl;
+
+            // Ask for coupon code first
+            float discountRate = 0.0;
+            cout << "\nEnter coupon code (or press Enter to skip): ";
+            string enteredCoupon;
+            cin.ignore();
+            getline(cin, enteredCoupon);
+
+            if (!enteredCoupon.empty()) {
+                if (applyCoupon(enteredCoupon, discountRate)) {
+                    cout << "Coupon applied successfully. Discount of " << discountRate * 100 << "% will be applied.\n";
+                } else {
+                    cout << "Invalid coupon code. No discount will be applied.\n";
+                }
+            }
+
+            // Display Bill with applied discount
+            generateBill(productName, quantity, stof(price), discountRate);
+
+            // Ask for payment method after showing the bill
+            displayPaymentOptions();
+            int paymentChoice;
+            cin >> paymentChoice;
+
+            if (paymentChoice == 1) {
+                processCardPayment();
+            } else if (paymentChoice == 2) {
+                processUPIPayment();
+            } else {
+                cout << "Invalid payment choice. Transaction cancelled.\n";
+                return;
+            }
+
+            // Save the order
+            string orderData = username + "," + product + "," + to_string(quantity) + "," + to_string(time(0));
+            ofstream orderFile(ORDERS_FILE, ios::app);
+            orderFile << orderData << endl;
+            orderFile.close();
+
+            cout << "Order placed successfully for " << quantity << " unit(s) of \"" << productName << "\".\n";
+        } else {
+            tempFile << line << endl;
         }
     }
+
+    file.close();
+    tempFile.close();
+
+    remove(PRODUCTS_FILE.c_str());
+    rename("temp.txt", PRODUCTS_FILE.c_str());
+
+    if (!found) {
+        cout << "Product not found or insufficient stock.\n";
+    }
+} 
 };
 
 //Seller
@@ -444,7 +600,7 @@ int main() {
                             cin >> quantity;
                             cin.ignore();
 
-                            buyer->placeOrder(productName, quantity);
+                            buyer->placeOrder(username, productName, quantity);
                         } else if (buyerChoice == 3) {
                             cout << "Logging out...\n";
                             break;

@@ -263,14 +263,36 @@ public:
         : User(uname, pwd, mail, name, phone, "admin") {}
 
     void viewAllUsers() {
-        ifstream file(USERS_FILE);
-        string line;
-        cout << "\nAll Users:\n";
-        while (getline(file, line)) {
-            cout << line << endl;
-        }
-        file.close();
+    ifstream file(USERS_FILE);
+    string line;
+
+    if (!file.is_open()) {
+        cout << "Error opening file." << endl;
+        return;
     }
+
+    cout << "\nAll Users:\n";
+    cout << "Username | Full Name | Role | Email | Phone No | Encrypted Password\n";
+    cout << "--------------------------------------------------------\n";
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string username, role, email, phone, password, encryptedPassword, fullname;
+
+        getline(ss, username, ',');
+        getline(ss, password, ',');
+        getline(ss, email, ',');
+        getline(ss, role, ',');
+        getline(ss, fullname, ',');
+        getline(ss, phone, ',');
+
+        encryptedPassword = string(password.length(), '*'); 
+
+        cout << username << " | " << fullname << " | " << role << " | " << email << " | " << phone << " | " << encryptedPassword << endl;
+    }
+
+    file.close();
+}
 
     void viewAllTransactions() {
         ifstream file(TRANSACTIONS_FILE);

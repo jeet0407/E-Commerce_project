@@ -1,4 +1,5 @@
-seller,laptop,765000.000000,2
-seller,insaan,200.000000,10
-seller,nothing,400.000000,294
-
+seller,mobile,9090.000000,89,Electronics
+seller,comb,70.000000,9,Home
+seller2,tv,60000.000000,30,Electronics
+seller3,t-shirt,400.000000,50,Clothing
+seller4, HC Verma,100.000000,500,Books

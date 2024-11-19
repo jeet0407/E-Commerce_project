@@ -1,12 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <string>
-#include <ctime>
-#include<limits>
-
-
+#include <bits/stdc++.h>
 using namespace std;
 
 // File paths for data storage
@@ -64,8 +56,7 @@ public:
     static User* login(const string& username, const string& password);
 };
 
-//Buyer
-
+// Buyer Class
 class Buyer : public User {
 public:
     Buyer(string uname, string pwd, string mail, string name, string phone)
@@ -175,8 +166,8 @@ public:
                 int remainingStock = stoi(stock) - quantity;
                 tempFile << seller << "," << product << "," << price << "," << remainingStock << "," << category << "\n";
 
-                // Save the order
-                string orderData = username + "," + product + "," + to_string(quantity) + "," + to_string(time(0));
+                // Save the order with seller, buyer, product, quantity, and timestamp
+                string orderData = seller + "," + username + "," + product + "," + to_string(quantity) + "," + to_string(time(0));
                 FileHandler::saveToFile(ORDERS_FILE, orderData);
                 cout << "Order placed successfully for " << quantity << " unit(s) of \"" << productName << "\".\n";
             } else {
@@ -282,6 +273,37 @@ public:
         }
     }
 
+    void viewDispatchNotifications() {
+        ifstream file(ORDERS_FILE);
+        string line;
+        bool hasNotifications = false;
+
+        cout << "\n=== Dispatch Notifications ===\n";
+        while (getline(file, line)) {
+            stringstream ss(line);
+            string seller, buyer, product, quantity, timestamp;
+            getline(ss, seller, ',');
+            getline(ss, buyer, ',');
+            getline(ss, product, ',');
+            getline(ss, quantity, ',');
+            getline(ss, timestamp, ',');
+
+            if (seller == username) {
+                hasNotifications = true;
+                time_t orderTime = stoi(timestamp);
+                cout << "Buyer: " << buyer
+                     << " | Product: " << product
+                     << " | Quantity: " << quantity
+                     << " | Ordered At: " << ctime(&orderTime);
+            }
+        }
+        file.close();
+
+        if (!hasNotifications) {
+            cout << "No pending orders for dispatch.\n";
+        }
+    }
+
     void viewListedProducts() {
         ifstream file(PRODUCTS_FILE);
         string line;
@@ -306,44 +328,43 @@ public:
     }
 };
 
-//Admin
-
+// Admin Class
 class Admin : public User {
 public:
     Admin(string uname, string pwd, string mail, string name, string phone)
         : User(uname, pwd, mail, name, phone, "admin") {}
 
     void viewAllUsers() {
-    ifstream file(USERS_FILE);
-    string line;
+        ifstream file(USERS_FILE);
+        string line;
 
-    if (!file.is_open()) {
-        cout << "Error opening file." << endl;
-        return;
+        if (!file.is_open()) {
+            cout << "Error opening file." << endl;
+            return;
+        }
+
+        cout << "\nAll Users:\n";
+        cout << "Username | Full Name | Role | Email | Phone No | Encrypted Password\n";
+        cout << "--------------------------------------------------------\n";
+
+        while (getline(file, line)) {
+            stringstream ss(line);
+            string username, role, email, phone, password, encryptedPassword, fullname;
+
+            getline(ss, username, ',');
+            getline(ss, password, ',');
+            getline(ss, email, ',');
+            getline(ss, role, ',');
+            getline(ss, fullname, ',');
+            getline(ss, phone, ',');
+
+            encryptedPassword = string(password.length(), '*');
+
+            cout << username << " | " << fullname << " | " << role << " | " << email << " | " << phone << " | " << encryptedPassword << endl;
+        }
+
+        file.close();
     }
-
-    cout << "\nAll Users:\n";
-    cout << "Username | Full Name | Role | Email | Phone No | Encrypted Password\n";
-    cout << "--------------------------------------------------------\n";
-
-    while (getline(file, line)) {
-        stringstream ss(line);
-        string username, role, email, phone, password, encryptedPassword, fullname;
-
-        getline(ss, username, ',');
-        getline(ss, password, ',');
-        getline(ss, email, ',');
-        getline(ss, role, ',');
-        getline(ss, fullname, ',');
-        getline(ss, phone, ',');
-
-        encryptedPassword = string(password.length(), '*'); 
-
-        cout << username << " | " << fullname << " | " << role << " | " << email << " | " << phone << " | " << encryptedPassword << endl;
-    }
-
-    file.close();
-}
 
     void viewAllTransactions() {
         ifstream file(TRANSACTIONS_FILE);
@@ -364,7 +385,7 @@ User* User::login(const string& username, const string& password) {
     while (getline(file, line)) {
         stringstream ss(line);
         string uname, pwd, email, type, name, phone;
-        
+
         getline(ss, uname, ',');
         getline(ss, pwd, ',');
         getline(ss, email, ',');
@@ -556,7 +577,8 @@ int main() {
                              << "2. Edit Product\n"
                              << "3. Delete Product\n"
                              << "4. View Listed Products\n"
-                             << "5. Logout\n"
+                             << "5. View Dispatch Notifications\n"
+                             << "6. Logout\n"
                              << "Choose an option: ";
 
                         int sellerChoice;
@@ -619,6 +641,8 @@ int main() {
                         } else if (sellerChoice == 4) {
                             seller->viewListedProducts();
                         } else if (sellerChoice == 5) {
+                            seller->viewDispatchNotifications();
+                        } else if (sellerChoice == 6) {
                             cout << "Logging out...\n";
                             break;
                         } else {
@@ -666,4 +690,3 @@ int main() {
 
     return 0;
 }
-

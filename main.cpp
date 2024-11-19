@@ -92,41 +92,7 @@ public:
     }
 
     void placeOrder(const string& productName, int quantity) {
-        ifstream file(PRODUCTS_FILE);
-        ofstream tempFile("temp.txt");
-        string line;
-        bool found = false;
-
-        while (getline(file, line)) {
-            stringstream ss(line);
-            string seller, product, price, stock;
-            getline(ss, seller, ',');
-            getline(ss, product, ',');
-            getline(ss, price, ',');
-            getline(ss, stock, ',');
-
-            if (product == productName && stoi(stock) >= quantity) {
-                found = true;
-                int remainingStock = stoi(stock) - quantity;
-                tempFile << seller << "," << product << "," << price << "," << remainingStock << endl;
-
-                // Save the order
-                string orderData = username + "," + product + "," + to_string(quantity) + "," + to_string(time(0));
-                FileHandler::saveToFile(ORDERS_FILE, orderData);
-                cout << "Order placed successfully for " << quantity << " unit(s) of \"" << productName << "\".\n";
-            } else {
-                tempFile << line << endl;
-            }
-        }
-        file.close();
-        tempFile.close();
-
-        remove(PRODUCTS_FILE.c_str());
-        rename("temp.txt", PRODUCTS_FILE.c_str());
-
-        if (!found) {
-            cout << "Product not found or insufficient stock.\n";
-        }
+        
     }
 };
 

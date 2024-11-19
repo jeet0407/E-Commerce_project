@@ -1,3 +1,4 @@
 seller,laptop,765000.000000,2
-seller,insaan,200.000000,0
-seller,nothing,400.000000,296
+seller,insaan,200.000000,10
+seller,nothing,400.000000,294
+

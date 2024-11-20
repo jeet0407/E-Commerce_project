@@ -1,2 +1,0 @@
-seller,mobile,60000,67,Electronics
-seller2,t-shirt,400.000000,27,Clothing

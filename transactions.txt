@@ -1,0 +1,13 @@
+User,mobile,1,59000,1732087858
+User,mobile,1,59000,1732088382
+User,mobile,2,118000,1732089456
+seller,buyer,mobile,2,1732089491
+User,mobile,5,295000,1732090233
+seller,buyer,mobile,5,1732090277
+User,mobile,1,59000,1732090312
+User,mobile,2,118000,1732094338
+seller,buyer,mobile,1,1732094650
+seller,buyer,mobile,2,1732094657
+User,mobile,3,212400,1732094821
+User,t-shirt,3,1416,1732095108
+seller2,buyer,t-shirt,3,1732095151

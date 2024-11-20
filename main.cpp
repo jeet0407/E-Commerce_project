@@ -16,6 +16,7 @@ const string PRODUCTS_FILE = "products.txt";
 const string ORDERS_FILE = "orders.txt";
 const string TRANSACTIONS_FILE = "transactions.txt";
 const string COUPONS_FILE = "coupons.txt";
+const string NOTIFICATIONS_FILE = "notifications.txt";
 
 // Utility class for handling file operations
 class FileHandler
@@ -82,29 +83,86 @@ public:
     Buyer(string uname, string pwd, string mail, string name, string phone)
         : User(uname, pwd, mail, name, phone, "buyer") {}
 
+    // View all available products
     void viewAvailableProducts()
     {
         ifstream file(PRODUCTS_FILE);
+        if (!file.is_open())
+        {
+            cout << "Error: Unable to open products file.\n";
+            return;
+        }
+
         string line;
         cout << "\nAvailable Products:\n";
+        bool found = false;
         while (getline(file, line))
         {
             stringstream ss(line);
-            string seller, product, price, quantity;
+            string seller, product, price, stock, category;
             getline(ss, seller, ',');
             getline(ss, product, ',');
             getline(ss, price, ',');
-            getline(ss, quantity, ',');
+            getline(ss, stock, ',');
+            getline(ss, category, ',');
 
-            if (stoi(quantity) > 0)
+            if (stoi(stock) > 0)
             { // Only display products with stock
                 cout << "Product: " << product
                      << " | Price: " << price
-                     << " | Quantity: " << quantity
+                     << " | Quantity: " << stock
+                     << " | Category: " << category
                      << " | Sold by: " << seller << "\n";
+                found = true;
             }
         }
         file.close();
+
+        if (!found)
+        {
+            cout << "No products available at the moment.\n";
+        }
+    }
+
+    // View products filtered by category
+    void viewProductsByCategory(const string &category)
+    {
+        ifstream file(PRODUCTS_FILE);
+        if (!file.is_open())
+        {
+            cout << "Error: Unable to open products file.\n";
+            return;
+        }
+
+        string line;
+        bool found = false;
+        cout << "\nProducts in Category: " << category << "\n";
+
+        while (getline(file, line))
+        {
+            stringstream ss(line);
+            string seller, product, price, stock, categoryFromFile;
+            getline(ss, seller, ',');
+            getline(ss, product, ',');
+            getline(ss, price, ',');
+            getline(ss, stock, ',');
+            getline(ss, categoryFromFile, ',');
+
+            if (categoryFromFile == category && stoi(stock) > 0)
+            {
+                cout << "Product: " << product
+                     << " | Price: " << price
+                     << " | Quantity: " << stock
+                     << " | Sold by: " << seller << "\n";
+                found = true;
+            }
+        }
+        file.close();
+
+        if (!found)
+        {
+            cout << "No products found in this category.\n";
+        }
     }
 
     void waitForSeconds(int seconds)
@@ -129,6 +187,7 @@ public:
         cout << "\nEnter Card Number: ";
         cin >> cardNumber;
         cout << "Enter Card Holder Name: ";
+
         cin.ignore();
         getline(cin, cardHolderName);
 
@@ -227,20 +286,26 @@ public:
         cout << "\nEnter your delivery address: ";
         getline(cin, deliveryAddress);
 
+        string sellerName; // Store the seller name for the order
+        float productPrice = 0.0;
+
         while (getline(file, line))
         {
             stringstream ss(line);
-            string seller, product, price, stock;
+            string seller, product, price, stock, category;
             getline(ss, seller, ',');
             getline(ss, product, ',');
             getline(ss, price, ',');
             getline(ss, stock, ',');
+            getline(ss, category, ',');
 
             if (product == productName && stoi(stock) >= quantity)
             {
                 found = true;
+                sellerName = seller; // Store the seller's name
+                productPrice = stof(price);
                 int remainingStock = stoi(stock) - quantity;
-                tempFile << seller << "," << product << "," << price << "," << remainingStock << endl;
+                tempFile << seller << "," << product << "," << price << "," << remainingStock << "," << category << endl;
 
                 // Ask for coupon code first
                 float discountRate = 0.0;
@@ -283,23 +348,24 @@ public:
                 }
 
                 // Save the order along with the delivery address
-                string orderData = username + "," + product + "," + to_string(quantity) + "," + to_string(time(0)) + "," + deliveryAddress;
+                string orderData = sellerName + "," + username + "," + product + "," + to_string(quantity) + "," + to_string(time(0)) + "," + deliveryAddress;
                 ofstream orderFile(ORDERS_FILE, ios::app);
                 orderFile << orderData << endl;
                 orderFile.close();
 
                 cout << "Order placed successfully for " << quantity << " unit(s) of \"" << productName << "\".\n";
-                cout << "Delivery Address: " << deliveryAddress << endl; // Display the delivery address for confirmation
+                cout << "Delivery Address: " << deliveryAddress << endl;
             }
             else
             {
-                tempFile << line << endl;
+                tempFile << line << "\n";
             }
         }
 
         file.close();
         tempFile.close();
 
+        // Replace old product file with updated one
         remove(PRODUCTS_FILE.c_str());
         rename("temp.txt", PRODUCTS_FILE.c_str());
 
@@ -307,6 +373,68 @@ public:
         {
             cout << "Product not found or insufficient stock.\n";
         }
+    }
+
+    void checkOrderStatus()
+    {
+        ifstream file(NOTIFICATIONS_FILE);
+        if (!file.is_open())
+        {
+            cout << "Error: Unable to open notifications file.\n";
+            return;
+        }
+
+        string line;
+        bool hasNotifications = false;
+
+        cout << "\n=== Order Status ===\n";
+
+        while (getline(file, line))
+        {
+            stringstream ss(line);
+            string buyer, product, status, timestamp;
+            getline(ss, buyer, ',');
+            getline(ss, product, ',');
+            getline(ss, status, ',');
+            getline(ss, timestamp, ',');
+
+            if (buyer == username)
+            { // Match the logged-in buyer
+                hasNotifications = true;
+
+                // Convert timestamp to a readable format
+                try
+                {
+                    time_t notificationTime = stoul(timestamp);
+                    cout << "Product: " << product
+                         << " | Status: " << status
+                         << " | Updated At: " << ctime(&notificationTime); // Format as human-readable date
+                }
+                catch (const exception &e)
+                {
+                    cout << "Error processing notification timestamp: " << e.what() << "\n";
+                }
+            }
+        }
+
+        file.close();
+
+        if (!hasNotifications)
+        {
+            cout << "No updates on your orders.\n";
+        }
+    }
+
+    void checkMyOrders()
+    {
+        cout << "\n=== My Orders Status ===\n";
+
+        // Use the checkOrderStatus function
+        checkOrderStatus(); // Shows order updates for the logged-in buyer
+
+        cout << "\nPress Enter to continue...";
+        cin.ignore();
+        cin.get();
     }
 };
 
@@ -318,20 +446,20 @@ public:
     Seller(string uname, string pwd, string mail, string name, string phone)
         : User(uname, pwd, mail, name, phone, "seller") {}
 
-    void addProduct(const string &productName, double price, int quantity)
+    void addProduct(const string &productName, double price, int quantity, const string &category)
     {
-        string productData = username + "," + productName + "," + to_string(price) + "," + to_string(quantity);
+        string productData = username + "," + productName + "," + to_string(price) + "," + to_string(quantity) + "," + category;
         FileHandler::saveToFile(PRODUCTS_FILE, productData);
-        cout << "Product \"" << productName << "\" added successfully.\n";
+        cout << "Product \"" << productName << "\" added successfully in category \"" << category << "\".\n";
     }
 
-    void editProduct(const string &productName, double newPrice, int newQuantity)
+    void editProduct(const string &productName, double newPrice, int newQuantity, const string &newCategory)
     {
-        // Step 1: Check if the product exists for this seller
         ifstream file(PRODUCTS_FILE);
         string line;
         bool productExists = false;
 
+        // Step 1: Check if the product exists for this seller
         while (getline(file, line))
         {
             stringstream ss(line);
@@ -359,15 +487,16 @@ public:
             while (getline(file, line))
             {
                 stringstream ss(line);
-                string seller, product, price, quantity;
+                string seller, product, price, quantity, category;
                 getline(ss, seller, ',');
                 getline(ss, product, ',');
                 getline(ss, price, ',');
                 getline(ss, quantity, ',');
+                getline(ss, category, ',');
 
                 if (seller == username && product == productName)
                 {
-                    tempFile << seller << "," << product << "," << newPrice << "," << newQuantity << endl;
+                    tempFile << seller << "," << product << "," << newPrice << "," << newQuantity << "," << newCategory << endl;
                     updated = true;
                 }
                 else
@@ -375,6 +504,7 @@ public:
                     tempFile << line << endl;
                 }
             }
+
             file.close();
             tempFile.close();
 
@@ -385,10 +515,14 @@ public:
             {
                 cout << "Product \"" << productName << "\" updated successfully.\n";
             }
+            else
+            {
+                cout << "Product \"" << productName << "\" not found for the seller \"" << username << "\".\n";
+            }
         }
         else
         {
-            cout << "Product \"" << productName << "\" not found for the seller \"" << username << "\".\n";
+            cout << "Product \"" << productName << "\" does not exist.\n";
         }
     }
 
@@ -402,11 +536,12 @@ public:
         while (getline(file, line))
         {
             stringstream ss(line);
-            string seller, product, price, quantity;
+            string seller, product, price, quantity, category;
             getline(ss, seller, ',');
             getline(ss, product, ',');
             getline(ss, price, ',');
             getline(ss, quantity, ',');
+            getline(ss, category, ',');
 
             if (seller == username && product == productName)
             {
@@ -433,6 +568,107 @@ public:
         }
     }
 
+    void viewDispatchNotifications()
+    {
+        ifstream file(ORDERS_FILE);
+        if (!file.is_open())
+        {
+            cout << "Error: Unable to open orders file.\n";
+            return;
+        }
+
+        ofstream tempFile("temp.txt");
+        if (!tempFile.is_open())
+        {
+            cout << "Error: Unable to create temporary file.\n";
+            return;
+        }
+
+        string line;
+        bool hasNotifications = false;
+
+        cout << "\n=== Dispatch Notifications ===\n";
+
+        vector<string> remainingOrders;
+
+        while (getline(file, line))
+        {
+            stringstream ss(line);
+            string seller, buyer, product, quantity, timestamp, address;
+            getline(ss, seller, ',');
+            getline(ss, buyer, ',');
+            getline(ss, product, ',');
+            getline(ss, quantity, ',');
+            getline(ss, timestamp, ',');
+            getline(ss, address, ',');
+
+            if (seller == username)
+            {
+                hasNotifications = true;
+                time_t orderTime = stoul(timestamp);
+
+                cout << "\nOrder Details:\n";
+                cout << "Buyer: " << buyer << "\n";
+                cout << "Product: " << product << "\n";
+                cout << "Quantity: " << quantity << "\n";
+                cout << "Delivery Address: " << address << "\n";
+                cout << "Ordered At: " << ctime(&orderTime);
+                cout << "Do you want to dispatch this order? (y/n): ";
+
+                char choice;
+                cin >> choice;
+                if (cin.fail())
+                {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid input! Please enter a valid number.\n";
+                    continue;
+                }
+                cin.ignore();
+
+                if (choice == 'y' || choice == 'Y')
+                {
+                    // Record the transaction
+                    string transactionData = seller + "," + buyer + "," + product + "," + quantity + "," + to_string(time(0));
+                    FileHandler::saveToFile(TRANSACTIONS_FILE, transactionData);
+                    cout << "Order dispatched and transaction recorded.\n";
+
+                    // Notify the buyer
+                    string notification = buyer + "," + product + ",Dispatched," + to_string(time(0));
+                    FileHandler::saveToFile(NOTIFICATIONS_FILE, notification);
+                }
+                else
+                {
+                    // Notify the buyer that the order is pending
+                    string notification = buyer + "," + product + ",Pending," + to_string(time(0));
+                    FileHandler::saveToFile(NOTIFICATIONS_FILE, notification);
+
+                    // Keep the order in the remaining orders
+                    remainingOrders.push_back(line);
+                }
+            }
+            else
+            {
+                remainingOrders.push_back(line);
+            }
+        }
+
+        file.close();
+
+        // Rewrite the orders file with remaining orders
+        ofstream outFile(ORDERS_FILE);
+        for (const string &order : remainingOrders)
+        {
+            outFile << order << endl;
+        }
+        outFile.close();
+
+        if (!hasNotifications)
+        {
+            cout << "No pending orders for dispatch.\n";
+        }
+    }
+
     void viewListedProducts()
     {
         ifstream file(PRODUCTS_FILE);
@@ -441,17 +677,19 @@ public:
         while (getline(file, line))
         {
             stringstream ss(line);
-            string seller, product, price, quantity;
+            string seller, product, price, quantity, category;
             getline(ss, seller, ',');
             getline(ss, product, ',');
             getline(ss, price, ',');
             getline(ss, quantity, ',');
+            getline(ss, category, ',');
 
             if (seller == username)
             {
                 cout << "Product: " << product
                      << " | Price: " << price
-                     << " | Quantity: " << quantity << "\n";
+                     << " | Quantity: " << quantity
+                     << " | Category: " << category << "\n";
             }
         }
         file.close();
@@ -505,12 +743,66 @@ public:
     {
         ifstream file(TRANSACTIONS_FILE);
         string line;
-        cout << "\nAll Transactions:\n";
+        bool hasTransactions = false;
+
+        if (!file.is_open())
+        {
+            cout << "Error: Unable to open transactions file.\n";
+            return;
+        }
+
+        cout << "\n=== All Transactions ===\n";
+        cout << "----------------------------------------\n";
+
         while (getline(file, line))
         {
-            cout << line << endl;
+            stringstream ss(line);
+            string seller, buyer, product, quantity, timestamp;
+
+            try
+            {
+                if (!getline(ss, seller, ',') || seller.empty())
+                    throw runtime_error("Invalid seller");
+                if (!getline(ss, buyer, ',') || buyer.empty())
+                    throw runtime_error("Invalid buyer");
+                if (!getline(ss, product, ',') || product.empty())
+                    throw runtime_error("Invalid product");
+                if (!getline(ss, quantity, ',') || quantity.empty())
+                    throw runtime_error("Invalid quantity");
+                if (!getline(ss, timestamp, ',') || timestamp.empty())
+                    throw runtime_error("Invalid timestamp");
+
+                try
+                {
+                    time_t transactionTime = stoul(timestamp);
+                    hasTransactions = true;
+
+                    cout << "Seller: " << seller << "\n"
+                         << "Buyer: " << buyer << "\n"
+                         << "Product: " << product << "\n"
+                         << "Quantity: " << quantity << "\n"
+                         << "Transaction At: " << ctime(&transactionTime)
+                         << "----------------------------------------\n";
+                }
+                catch (const exception &e)
+                {
+                    cout << "Warning: Invalid timestamp format for transaction between " << seller << " and " << buyer << "\n";
+                    continue;
+                }
+            }
+            catch (const exception &e)
+            {
+                cout << "Error processing transaction: " << e.what() << "\n";
+                continue;
+            }
         }
+
         file.close();
+
+        if (!hasTransactions)
+        {
+            cout << "No transactions recorded yet.\n";
+        }
     }
 };
 
@@ -570,6 +862,15 @@ int main()
 
         int choice;
         cin >> choice;
+
+        if (cin.fail())
+        {                                                        // Check for invalid input
+            cin.clear();                                         // Clear the error flag
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Flush the input buffer
+            cout << "Invalid input! Please enter a valid number.\n";
+            continue;
+        }
+
         cin.ignore();
 
         if (choice == 1)
@@ -578,6 +879,15 @@ int main()
             cout << "1. Buyer\n2. Seller\n3. Admin\nChoose user type: ";
             int userType;
             cin >> userType;
+
+            if (cin.fail())
+            {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Invalid input! Please enter a valid number.\n";
+                continue;
+            }
+
             cin.ignore();
 
             string username, password, email, fullName, phoneNumber;
@@ -657,12 +967,23 @@ int main()
                 {
                     while (true)
                     {
-                        cout << "\n1. View Available Products\n"
+                        cout << "\n=== Buyer Menu ===\n";
+                        cout << "1. View All Products\n"
                              << "2. Place Order\n"
-                             << "3. Logout\n"
+                             << "3. View Products by Category\n"
+                             << "4. My Orders\n"
+                             << "5. Logout\n"
                              << "Choose an option: ";
+
                         int buyerChoice;
                         cin >> buyerChoice;
+                        if (cin.fail())
+                        {
+                            cin.clear();
+                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                            cout << "Invalid input! Please enter a valid number.\n";
+                            continue;
+                        }
                         cin.ignore();
 
                         if (buyerChoice == 1)
@@ -678,11 +999,66 @@ int main()
                             getline(cin, productName);
                             cout << "Enter quantity: ";
                             cin >> quantity;
+                            if (cin.fail())
+                            {
+                                cin.clear();
+                                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                                cout << "Invalid input! Please enter a valid number.\n";
+                                continue;
+                            }
                             cin.ignore();
 
                             buyer->placeOrder(username, productName, quantity);
                         }
                         else if (buyerChoice == 3)
+                        {
+                            cout << "\nSelect a category:\n"
+                                 << "1. Electronics\n"
+                                 << "2. Clothing\n"
+                                 << "3. Home\n"
+                                 << "4. Books\n"
+                                 << "Choose a category: ";
+
+                            int categoryChoice;
+                            cin >> categoryChoice;
+                            if (cin.fail())
+                            {
+                                cin.clear();
+                                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                                cout << "Invalid input! Please enter a valid number.\n";
+                                continue;
+                            }
+                            cin.ignore();
+
+                            string selectedCategory;
+                            switch (categoryChoice)
+                            {
+                            case 1:
+                                selectedCategory = "Electronics";
+                                break;
+                            case 2:
+                                selectedCategory = "Clothing";
+                                break;
+                            case 3:
+                                selectedCategory = "Home";
+                                break;
+                            case 4:
+                                selectedCategory = "Books";
+                                break;
+                            default:
+                                cout << "Invalid category!\n";
+                                continue;
+                            }
+
+                            buyer->viewProductsByCategory(selectedCategory);
+                        }
+
+                        else if (buyerChoice == 4)
+                        {
+                            buyer->checkMyOrders();
+                        }
+
+                        else if (buyerChoice == 5)
                         {
                             cout << "Logging out...\n";
                             break;
@@ -697,14 +1073,24 @@ int main()
                 {
                     while (true)
                     {
-                        cout << "\n1. Add Product\n"
+                        cout << "\n=== Seller Menu ===\n";
+                        cout << "1. Add Product\n"
                              << "2. Edit Product\n"
                              << "3. Delete Product\n"
                              << "4. View Listed Products\n"
-                             << "5. Logout\n"
+                             << "5. View Dispatch Notifications\n"
+                             << "6. Logout\n"
                              << "Choose an option: ";
+
                         int sellerChoice;
                         cin >> sellerChoice;
+                        if (cin.fail())
+                        {
+                            cin.clear();
+                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                            cout << "Invalid input! Please enter a valid number.\n";
+                            continue;
+                        }
                         cin.ignore();
 
                         if (sellerChoice == 1)
@@ -712,6 +1098,7 @@ int main()
                             string productName;
                             double price;
                             int quantity;
+                            string category;
 
                             cout << "Enter product name: ";
                             getline(cin, productName);
@@ -721,53 +1108,52 @@ int main()
                             cin >> quantity;
                             cin.ignore();
 
-                            seller->addProduct(productName, price, quantity);
+                            cout << "Select category (1. Electronics, 2. Clothing, 3. Home, 4. Books): ";
+                            int categoryChoice;
+                            cin >> categoryChoice;
+                            cin.ignore();
+
+                            switch (categoryChoice)
+                            {
+                            case 1:
+                                category = "Electronics";
+                                break;
+                            case 2:
+                                category = "Clothing";
+                                break;
+                            case 3:
+                                category = "Home";
+                                break;
+                            case 4:
+                                category = "Books";
+                                break;
+                            default:
+                                category = "Others";
+                                break;
+                            }
+
+                            seller->addProduct(productName, price, quantity, category);
                         }
                         else if (sellerChoice == 2)
                         {
                             string productName;
                             double newPrice;
                             int newQuantity;
+                            string newCategory;
 
                             cout << "Enter product name to edit: ";
                             getline(cin, productName);
 
-                            // Check if the product exists
-                            ifstream file(PRODUCTS_FILE);
-                            string line;
-                            bool productExists = false;
+                            cout << "Enter new price: ";
+                            cin >> newPrice;
+                            cout << "Enter new quantity: ";
+                            cin >> newQuantity;
+                            cin.ignore();
+                            cout << "Enter new category: ";
+                            getline(cin, newCategory);
 
-                            while (getline(file, line))
-                            {
-                                stringstream ss(line);
-                                string seller, product, price, quantity;
-                                getline(ss, seller, ',');
-                                getline(ss, product, ',');
-
-                                if (seller == username && product == productName)
-                                {
-                                    productExists = true;
-                                    break;
-                                }
-                            }
-                            file.close();
-
-                            if (productExists)
-                            {
-                                cout << "Enter new price: ";
-                                cin >> newPrice;
-                                cout << "Enter new quantity: ";
-                                cin >> newQuantity;
-                                cin.ignore();
-
-                                seller->editProduct(productName, newPrice, newQuantity);
-                            }
-                            else
-                            {
-                                cout << "Oops!!! No such product exists.\n";
-                            }
+                            seller->editProduct(productName, newPrice, newQuantity, newCategory);
                         }
-
                         else if (sellerChoice == 3)
                         {
                             string productName;
@@ -783,6 +1169,10 @@ int main()
                         }
                         else if (sellerChoice == 5)
                         {
+                            seller->viewDispatchNotifications();
+                        }
+                        else if (sellerChoice == 6)
+                        {
                             cout << "Logging out...\n";
                             break;
                         }
@@ -796,10 +1186,12 @@ int main()
                 {
                     while (true)
                     {
-                        cout << "\n1. View All Users\n"
+                        cout << "\n=== Admin Menu ===\n";
+                        cout << "1. View All Users\n"
                              << "2. View All Transactions\n"
                              << "3. Logout\n"
                              << "Choose an option: ";
+
                         int adminChoice;
                         cin >> adminChoice;
                         cin.ignore();
@@ -817,12 +1209,14 @@ int main()
                             cout << "Logging out...\n";
                             break;
                         }
+
                         else
                         {
                             cout << "Invalid choice! Try again.\n";
                         }
                     }
                 }
+
                 delete user;
             }
             else
@@ -840,5 +1234,6 @@ int main()
             cout << "Invalid choice! Try again.\n";
         }
     }
+
     return 0;
 }

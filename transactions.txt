@@ -11,3 +11,6 @@ seller,buyer,mobile,2,1732094657
 User,mobile,3,212400,1732094821
 User,t-shirt,3,1416,1732095108
 seller2,buyer,t-shirt,3,1732095151
+User,sneh,1,755.2,1732125050
+seller,buyer,mobile,3,1732125251
+seller,buyer,sneh,1,1732125261

@@ -8,6 +8,13 @@
 #include <bits/stdc++.h>
 #include <chrono>
 #include <cctype>
+#define RESET "\033[0m"
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define YELLOW "\033[33m"
+#define BLUE "\033[34m"
+#define BOLD "\033[1m"
+#define CYAN "\033[36m"
 using namespace std;
 
 // File paths for data storage
@@ -89,12 +96,15 @@ public:
         ifstream file(PRODUCTS_FILE);
         if (!file.is_open())
         {
-            cout << "Error: Unable to open products file.\n";
+            cout << BOLD << RED << "Error: Unable to open products file.\n"
+                 << RESET;
             return;
         }
 
         string line;
-        cout << "\nAvailable Products:\n";
+        cout << "\n"
+             << BOLD << CYAN << "Available Products:\n"
+             << RESET;
         bool found = false;
         while (getline(file, line))
         {
@@ -108,11 +118,11 @@ public:
 
             if (stoi(stock) > 0)
             { // Only display products with stock
-                cout << "Product: " << product
-                     << " | Price: " << price
-                     << " | Quantity: " << stock
-                     << " | Category: " << category
-                     << " | Sold by: " << seller << "\n";
+                cout << BOLD << GREEN << "Product: " << RESET << product
+                     << " | " << BOLD << GREEN << "Price: " << RESET << price
+                     << " | " << BOLD << GREEN << "Quantity: " << RESET << stock
+                     << " | " << BOLD << GREEN << "Category: " << RESET << category
+                     << " | " << BOLD << GREEN << "Sold by: " << RESET << seller << "\n";
                 found = true;
             }
         }
@@ -120,7 +130,8 @@ public:
 
         if (!found)
         {
-            cout << "No products available at the moment.\n";
+            cout << BOLD << YELLOW << "No products available at the moment.\n"
+                 << RESET;
         }
     }
 
@@ -130,13 +141,15 @@ public:
         ifstream file(PRODUCTS_FILE);
         if (!file.is_open())
         {
-            cout << "Error: Unable to open products file.\n";
+            cout << BOLD << RED << "Error: Unable to open products file.\n"
+                 << RESET;
             return;
         }
 
         string line;
         bool found = false;
-        cout << "\nProducts in Category: " << category << "\n";
+        cout << "\n"
+             << BOLD << CYAN << "Products in Category: " << RESET << category << "\n";
 
         while (getline(file, line))
         {
@@ -150,10 +163,10 @@ public:
 
             if (categoryFromFile == category && stoi(stock) > 0)
             {
-                cout << "Product: " << product
-                     << " | Price: " << price
-                     << " | Quantity: " << stock
-                     << " | Sold by: " << seller << "\n";
+                cout << BOLD << GREEN << "Product: " << RESET << product
+                     << " | " << BOLD << GREEN << "Price: " << RESET << price
+                     << " | " << BOLD << GREEN << "Quantity: " << RESET << stock
+                     << " | " << BOLD << GREEN << "Sold by: " << RESET << seller << "\n";
                 found = true;
             }
         }
@@ -161,7 +174,8 @@ public:
 
         if (!found)
         {
-            cout << "No products found in this category.\n";
+            cout << BOLD << YELLOW << "No products found in this category.\n"
+                 << RESET;
         }
     }
 
@@ -175,42 +189,54 @@ public:
     }
     void displayPaymentOptions()
     {
-        cout << "\nChoose a payment method:\n";
-        cout << "1. Card Payment\n";
-        cout << "2. UPI\n";
-        cout << "Enter your choice: ";
+        cout << "\n"
+             << BOLD << CYAN << "Choose a payment method:\n"
+             << RESET;
+        cout << BOLD << GREEN << "1. Card Payment\n"
+             << RESET;
+        cout << BOLD << GREEN << "2. UPI\n"
+             << RESET;
+        cout << BOLD << CYAN << "Enter your choice: " << RESET;
     }
 
     void processCardPayment()
     {
         string cardNumber, cardHolderName;
-        cout << "\nEnter Card Number: ";
+        cout << "\n"
+             << BOLD << CYAN << "Enter Card Number: " << RESET;
         cin >> cardNumber;
-        cout << "Enter Card Holder Name: ";
+        cout << BOLD << CYAN << "Enter Card Holder Name: " << RESET;
 
         cin.ignore();
         getline(cin, cardHolderName);
 
-        cout << "Your payment will be redirected in 10 seconds...\n";
+        cout << BOLD << GREEN << "Your payment will be redirected in 10 seconds...\n"
+             << RESET;
         waitForSeconds(5);
 
-        cout << "Processing payment...\n";
+        cout << BOLD << GREEN << "Processing payment...\n"
+             << RESET;
         waitForSeconds(5); // Simulate a delay for payment processing
-        cout << "Payment successful!\n";
+        cout << BOLD << GREEN << "Payment successful!\n"
+             << RESET;
     }
 
     void processUPIPayment()
     {
         string upiID;
-        cout << "\nEnter UPI ID: ";
+        cout << "\n"
+             << BOLD << CYAN << "Enter UPI ID: " << RESET;
         cin >> upiID;
 
-        cout << "Your payment will be redirected in 10 seconds...\n";
+        cout << BOLD << GREEN << "Your payment will be redirected in 10 seconds...\n"
+             << RESET;
         waitForSeconds(5);
 
-        cout << "Processing payment...\n";
+        cout << BOLD << GREEN << "Processing payment...\n"
+             << RESET;
         waitForSeconds(5); // Simulate a delay for payment processing
-        cout << "Payment successful!\n";
+        cout << BOLD << GREEN << "Payment successful!\n"
+             << RESET;
     }
 
     bool applyCoupon(const string &enteredCoupon, float &discountRate)
@@ -221,7 +247,7 @@ public:
         // Check if the file was opened successfully
         if (!file)
         {
-            cout << "Error opening coupon file!" << endl;
+            cout << BOLD << RED << "Error opening coupon file!" << RESET << endl;
             return false;
         }
 
@@ -229,20 +255,22 @@ public:
         while (getline(file, coupon))
         {
             // Debugging statement: Print the coupon being read from the file and the entered coupon
-            cout << "Checking coupon: '" << coupon << "' against entered: '" << enteredCoupon << "'\n";
+            cout << BOLD << CYAN << "Checking coupon: '" << coupon << "' against entered: '" << enteredCoupon << "'\n"
+                 << RESET;
 
             // Compare the entered coupon directly with the coupon from the file
             if (coupon == enteredCoupon)
             {
                 // Apply a random discount between 15% and 20%
                 discountRate = (rand() % 6 + 15) / 100.0; // Random discount between 15% and 20%
-                cout << "Coupon matched! Discount applied: " << discountRate * 100 << "%\n";
+                cout << BOLD << GREEN << "Coupon matched! Discount applied: " << RESET << discountRate * 100 << "%" << endl;
                 return true; // Coupon found, discount applied
             }
         }
 
         // If no coupon matched
-        cout << "Coupon not found!\n";
+        cout << BOLD << YELLOW << "Coupon not found!\n"
+             << RESET;
         return false; // Coupon not found
     }
 
@@ -257,16 +285,17 @@ public:
 
         cout << fixed << setprecision(2);
         cout << "\n--- BILL ---\n";
-        cout << "Product Name: " << productName << "\n";
-        cout << "Quantity: " << quantity << "\n";
-        cout << "Price per Unit: " << pricePerUnit << "\n";
-        cout << "Total Amount: " << totalAmount << "\n";
-        cout << "Discount Applied: " << discountAmount << " (" << discountRate * 100 << "%)\n";
-        cout << "Subtotal after Discount: " << subTotal << "\n";
-        cout << "CGST (9%): " << cgst << "\n";
-        cout << "SGST (9%): " << sgst << "\n";
-        cout << "Final Amount to Pay: " << finalAmount << "\n";
-        cout << "-------------------\n";
+        cout << BOLD << CYAN << "Product Name: " << RESET << productName << "\n";
+        cout << BOLD << CYAN << "Quantity: " << RESET << quantity << "\n";
+        cout << BOLD << CYAN << "Price per Unit: " << RESET << pricePerUnit << "\n";
+        cout << BOLD << CYAN << "Total Amount: " << RESET << totalAmount << "\n";
+        cout << BOLD << CYAN << "Discount Applied: " << RESET << discountAmount << " (" << discountRate * 100 << "%)\n";
+        cout << BOLD << CYAN << "Subtotal after Discount: " << RESET << subTotal << "\n";
+        cout << BOLD << CYAN << "CGST (9%): " << RESET << cgst << "\n";
+        cout << BOLD << CYAN << "SGST (9%): " << RESET << sgst << "\n";
+        cout << BOLD << CYAN << "Final Amount to Pay: " << RESET << finalAmount << "\n";
+        cout << BOLD << CYAN << "-------------------\n"
+             << RESET;
 
         // Save transaction details to file
         ofstream transactionFile(TRANSACTIONS_FILE, ios::app);
@@ -283,7 +312,8 @@ public:
 
         // Ask for the delivery address
         string deliveryAddress;
-        cout << "\nEnter your delivery address: ";
+        cout << "\n"
+             << BOLD << CYAN << "Enter your delivery address: " << RESET;
         getline(cin, deliveryAddress);
 
         string sellerName; // Store the seller name for the order
@@ -309,7 +339,8 @@ public:
 
                 // Ask for coupon code first
                 float discountRate = 0.0;
-                cout << "\nEnter coupon code (or press Enter to skip): ";
+                cout << "\n"
+                     << BOLD << CYAN << "Enter coupon code (or press Enter to skip): " << RESET;
                 string enteredCoupon;
                 getline(cin, enteredCoupon);
 
@@ -317,11 +348,13 @@ public:
                 {
                     if (applyCoupon(enteredCoupon, discountRate))
                     {
-                        cout << "Coupon applied successfully. Discount of " << discountRate * 100 << "% will be applied.\n";
+                        cout << BOLD << GREEN << "Coupon applied successfully. Discount of " << discountRate * 100 << "% will be applied.\n"
+                             << RESET;
                     }
                     else
                     {
-                        cout << "Invalid coupon code. No discount will be applied.\n";
+                        cout << BOLD << YELLOW << "Invalid coupon code. No discount will be applied.\n"
+                             << RESET;
                     }
                 }
 
@@ -343,7 +376,8 @@ public:
                 }
                 else
                 {
-                    cout << "Invalid payment choice. Transaction cancelled.\n";
+                    cout << BOLD << RED << "Invalid payment choice. Transaction cancelled.\n"
+                         << RESET;
                     return;
                 }
 
@@ -353,8 +387,9 @@ public:
                 orderFile << orderData << endl;
                 orderFile.close();
 
-                cout << "Order placed successfully for " << quantity << " unit(s) of \"" << productName << "\".\n";
-                cout << "Delivery Address: " << deliveryAddress << endl;
+                cout << BOLD << GREEN << "Order placed successfully for " << quantity << " unit(s) of \"" << productName << "\".\n"
+                     << RESET;
+                cout << BOLD << CYAN << "Delivery Address: " << RESET << deliveryAddress << endl;
             }
             else
             {
@@ -371,7 +406,8 @@ public:
 
         if (!found)
         {
-            cout << "Product not found or insufficient stock.\n";
+            cout << BOLD << RED << "Product not found or insufficient stock.\n"
+                 << RESET;
         }
     }
 
@@ -380,14 +416,17 @@ public:
         ifstream file(NOTIFICATIONS_FILE);
         if (!file.is_open())
         {
-            cout << "Error: Unable to open notifications file.\n";
+            cout << BOLD << RED << "Error: Unable to open notifications file.\n"
+                 << RESET;
             return;
         }
 
         string line;
         bool hasNotifications = false;
 
-        cout << "\n=== Order Status ===\n";
+        cout << "\n"
+             << BOLD << CYAN << "=== Order Status ===\n"
+             << RESET;
 
         while (getline(file, line))
         {
@@ -406,13 +445,13 @@ public:
                 try
                 {
                     time_t notificationTime = stoul(timestamp);
-                    cout << "Product: " << product
-                         << " | Status: " << status
-                         << " | Updated At: " << ctime(&notificationTime); // Format as human-readable date
+                    cout << BOLD << GREEN << "Product: " << RESET << product
+                         << " | " << BOLD << GREEN << "Status: " << RESET << status
+                         << " | " << BOLD << GREEN << "Updated At: " << RESET << ctime(&notificationTime); // Format as human-readable date
                 }
                 catch (const exception &e)
                 {
-                    cout << "Error processing notification timestamp: " << e.what() << "\n";
+                    cout << BOLD << RED << "Error processing notification timestamp: " << RESET << e.what() << "\n";
                 }
             }
         }
@@ -421,18 +460,22 @@ public:
 
         if (!hasNotifications)
         {
-            cout << "No updates on your orders.\n";
+            cout << BOLD << YELLOW << "No updates on your orders.\n"
+                 << RESET;
         }
     }
 
     void checkMyOrders()
     {
-        cout << "\n=== My Orders Status ===\n";
+        cout << "\n"
+             << BOLD << CYAN << "=== My Orders Status ===\n"
+             << RESET;
 
         // Use the checkOrderStatus function
         checkOrderStatus(); // Shows order updates for the logged-in buyer
 
-        cout << "\nPress Enter to continue...";
+        cout << "\n"
+             << BOLD << CYAN << "Press Enter to continue..." << RESET;
         cin.ignore();
         cin.get();
     }
@@ -450,7 +493,8 @@ public:
     {
         string productData = username + "," + productName + "," + to_string(price) + "," + to_string(quantity) + "," + category;
         FileHandler::saveToFile(PRODUCTS_FILE, productData);
-        cout << "Product \"" << productName << "\" added successfully in category \"" << category << "\".\n";
+        cout << BOLD << GREEN << "Product \"" << productName << "\" added successfully in category \"" << category << "\".\n"
+             << RESET;
     }
 
     void editProduct(const string &productName, double newPrice, int newQuantity, const string &newCategory)
@@ -513,16 +557,19 @@ public:
 
             if (updated)
             {
-                cout << "Product \"" << productName << "\" updated successfully.\n";
+                cout << BOLD << GREEN << "Product \"" << productName << "\" updated successfully.\n"
+                     << RESET;
             }
             else
             {
-                cout << "Product \"" << productName << "\" not found for the seller \"" << username << "\".\n";
+                cout << BOLD << RED << "Product \"" << productName << "\" not found for the seller \"" << username << "\".\n"
+                     << RESET;
             }
         }
         else
         {
-            cout << "Product \"" << productName << "\" does not exist.\n";
+            cout << BOLD << RED << "Product \"" << productName << "\" does not exist.\n"
+                 << RESET;
         }
     }
 
@@ -560,11 +607,13 @@ public:
 
         if (found)
         {
-            cout << "Product \"" << productName << "\" deleted successfully.\n";
+            cout << BOLD << GREEN << "Product \"" << productName << "\" deleted successfully.\n"
+                 << RESET;
         }
         else
         {
-            cout << "Product not found!\n";
+            cout << BOLD << RED << "Product not found!\n"
+                 << RESET;
         }
     }
 
@@ -573,21 +622,24 @@ public:
         ifstream file(ORDERS_FILE);
         if (!file.is_open())
         {
-            cout << "Error: Unable to open orders file.\n";
+            cout << BOLD << RED << "Error: Unable to open orders file.\n"
+                 << RESET;
             return;
         }
 
         ofstream tempFile("temp.txt");
         if (!tempFile.is_open())
         {
-            cout << "Error: Unable to create temporary file.\n";
+            cout << BOLD << RED << "Error: Unable to create temporary file.\n"
+                 << RESET;
             return;
         }
 
         string line;
         bool hasNotifications = false;
 
-        cout << "\n=== Dispatch Notifications ===\n";
+        cout << BOLD << CYAN << "\n=== Dispatch Notifications ===\n"
+             << RESET;
 
         vector<string> remainingOrders;
 
@@ -607,13 +659,14 @@ public:
                 hasNotifications = true;
                 time_t orderTime = stoul(timestamp);
 
-                cout << "\nOrder Details:\n";
+                cout << BOLD << "Order Details:\n"
+                     << RESET;
                 cout << "Buyer: " << buyer << "\n";
                 cout << "Product: " << product << "\n";
                 cout << "Quantity: " << quantity << "\n";
                 cout << "Delivery Address: " << address << "\n";
                 cout << "Ordered At: " << ctime(&orderTime);
-                cout << "Do you want to dispatch this order? (y/n): ";
+                cout << BOLD << "Do you want to dispatch this order? (y/n): " << RESET;
 
                 char choice;
                 cin >> choice;
@@ -621,7 +674,8 @@ public:
                 {
                     cin.clear();
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    cout << "Invalid input! Please enter a valid number.\n";
+                    cout << BOLD << RED << "Invalid input! Please enter a valid number.\n"
+                         << RESET;
                     continue;
                 }
                 cin.ignore();
@@ -631,7 +685,8 @@ public:
                     // Record the transaction
                     string transactionData = seller + "," + buyer + "," + product + "," + quantity + "," + to_string(time(0));
                     FileHandler::saveToFile(TRANSACTIONS_FILE, transactionData);
-                    cout << "Order dispatched and transaction recorded.\n";
+                    cout << BOLD << GREEN << "Order dispatched and transaction recorded.\n"
+                         << RESET;
 
                     // Notify the buyer
                     string notification = buyer + "," + product + ",Dispatched," + to_string(time(0));
@@ -665,7 +720,8 @@ public:
 
         if (!hasNotifications)
         {
-            cout << "No pending orders for dispatch.\n";
+            cout << BOLD << YELLOW << "No pending orders for dispatch.\n"
+                 << RESET;
         }
     }
 
@@ -673,7 +729,8 @@ public:
     {
         ifstream file(PRODUCTS_FILE);
         string line;
-        cout << "\nYour Listed Products:\n";
+        cout << BOLD << CYAN << "\nYour Listed Products:\n"
+             << RESET;
         while (getline(file, line))
         {
             stringstream ss(line);
@@ -686,10 +743,10 @@ public:
 
             if (seller == username)
             {
-                cout << "Product: " << product
-                     << " | Price: " << price
-                     << " | Quantity: " << quantity
-                     << " | Category: " << category << "\n";
+                cout << BOLD << "Product: " << RESET << product
+                     << " | " << BOLD << "Price: " << RESET << price
+                     << " | " << BOLD << "Quantity: " << RESET << quantity
+                     << " | " << BOLD << "Category: " << RESET << category << "\n";
             }
         }
         file.close();
@@ -711,12 +768,15 @@ public:
 
         if (!file.is_open())
         {
-            cout << "Error opening file." << endl;
+            cout << RED << "Error opening file." << RESET << endl;
             return;
         }
 
-        cout << "\nAll Users:\n";
-        cout << "Username | Full Name | Role | Email | Phone No | Encrypted Password\n";
+        cout << BOLD << CYAN << "\nAll Users:\n"
+             << RESET;
+        cout << BOLD << "Username" << RESET << " | " << BOLD << "Full Name" << RESET
+             << " | " << BOLD << "Role" << RESET << " | " << BOLD << "Email" << RESET
+             << " | " << BOLD << "Phone No" << RESET << " | " << BOLD << "Encrypted Password" << RESET << endl;
         cout << "--------------------------------------------------------\n";
 
         while (getline(file, line))
@@ -733,7 +793,8 @@ public:
 
             encryptedPassword = string(password.length(), '*');
 
-            cout << username << " | " << fullname << " | " << role << " | " << email << " | " << phone << " | " << encryptedPassword << endl;
+            cout << username << " | " << fullname << " | " << role << " | " << email
+                 << " | " << phone << " | " << encryptedPassword << endl;
         }
 
         file.close();
@@ -747,11 +808,11 @@ public:
 
         if (!file.is_open())
         {
-            cout << "Error: Unable to open transactions file.\n";
+            cout << RED << "Error: Unable to open transactions file." << RESET << endl;
             return;
         }
 
-        cout << "\n=== All Transactions ===\n";
+        cout << BOLD << CYAN << "\n=== All Transactions ===" << RESET << endl;
         cout << "----------------------------------------\n";
 
         while (getline(file, line))
@@ -777,7 +838,7 @@ public:
                     time_t transactionTime = stoul(timestamp);
                     hasTransactions = true;
 
-                    cout << "Seller: " << seller << "\n"
+                    cout << "User-persona: " << seller << "\n"
                          << "Buyer: " << buyer << "\n"
                          << "Product: " << product << "\n"
                          << "Quantity: " << quantity << "\n"
@@ -786,13 +847,13 @@ public:
                 }
                 catch (const exception &e)
                 {
-                    cout << "Warning: Invalid timestamp format for transaction between " << seller << " and " << buyer << "\n";
+                    cout << YELLOW << "Warning: Invalid timestamp format for transaction between " << seller << " and " << buyer << RESET << "\n";
                     continue;
                 }
             }
             catch (const exception &e)
             {
-                cout << "Error processing transaction: " << e.what() << "\n";
+                cout << RED << "Error processing transaction: " << e.what() << RESET << "\n";
                 continue;
             }
         }
@@ -857,8 +918,21 @@ int main()
 {
     while (true)
     {
-        cout << "\n=== E-commerce System ===\n";
-        cout << "1. Sign Up\n2. Login\n3. Exit\nChoose an option: ";
+        cout << BLUE << "\n========================================\n"
+             << RESET;
+        cout << BOLD << BLUE << "           E-COMMERCE SYSTEM           \n"
+             << RESET;
+        cout << BLUE << "========================================\n"
+             << RESET;
+        cout << BOLD << YELLOW << setw(4) << "1. " << "Sign Up\n"
+             << RESET;
+        cout << BOLD << YELLOW << setw(4) << "2. " << "Login\n"
+             << RESET;
+        cout << BOLD << YELLOW << setw(4) << "3. " << "Exit\n"
+             << RESET;
+        cout << BLUE << "----------------------------------------\n"
+             << RESET;
+        cout << YELLOW << "Choose an option: ";
 
         int choice;
         cin >> choice;
@@ -867,7 +941,8 @@ int main()
         {                                                        // Check for invalid input
             cin.clear();                                         // Clear the error flag
             cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Flush the input buffer
-            cout << "Invalid input! Please enter a valid number.\n";
+            cout << RED << "Invalid input! Please enter a valid number.\n"
+                 << RESET;
             continue;
         }
 
@@ -875,8 +950,22 @@ int main()
 
         if (choice == 1)
         {
-            cout << "\n=== Sign Up ===\n";
-            cout << "1. Buyer\n2. Seller\n3. Admin\nChoose user type: ";
+            cout << BLUE << "\n========================================\n"
+                 << RESET;
+            cout << BLUE << "                 SIGN UP                \n"
+                 << RESET;
+            cout << BLUE << "========================================\n"
+                 << RESET;
+            cout << BOLD << YELLOW << setw(4) << "1. " << "Buyer\n"
+                 << RESET;
+            cout << BOLD << YELLOW << setw(4) << "2. " << "Seller\n"
+                 << RESET;
+            cout << BOLD << YELLOW << setw(4) << "3. " << "Admin\n"
+                 << RESET;
+            cout << BLUE << "----------------------------------------\n"
+                 << RESET;
+            cout << YELLOW << "Choose user type: " << RESET;
+
             int userType;
             cin >> userType;
 
@@ -884,7 +973,8 @@ int main()
             {
                 cin.clear();
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                cout << "Invalid input! Please enter a valid number.\n";
+                cout << BOLD << RED << "Invalid input! Please enter a valid number.\n"
+                     << RESET;
                 continue;
             }
 
@@ -892,38 +982,42 @@ int main()
 
             string username, password, email, fullName, phoneNumber;
 
-            cout << "Enter username: ";
+            cout << BOLD << YELLOW << "Enter username: " << RESET;
             getline(cin, username);
             if (FileHandler::doesUserExist(username))
             {
-                cout << "Username already exists!\n";
+                cout << BOLD << RED << "Username already exists!\n"
+                     << RESET;
                 continue;
             }
 
-            cout << "Enter password (min 6 characters): ";
+            cout << BOLD << YELLOW << "Enter password (min 6 characters): " << RESET;
             getline(cin, password);
             if (!isValidPassword(password))
             {
-                cout << "Invalid password!\n";
+                cout << BOLD << RED << "Invalid password!\n"
+                     << RESET;
                 continue;
             }
 
-            cout << "Enter email: ";
+            cout << BOLD << YELLOW << "Enter email: " << RESET;
             getline(cin, email);
             if (!isValidEmail(email))
             {
-                cout << "Invalid email format!\n";
+                cout << BOLD << RED << "Invalid email format!\n"
+                     << RESET;
                 continue;
             }
 
-            cout << "Enter full name: ";
+            cout << BOLD << YELLOW << "Enter full name: " << RESET;
             getline(cin, fullName);
 
-            cout << "Enter phone number (10 digits): ";
+            cout << BOLD << YELLOW << "Enter phone number (10 digits): " << RESET;
             getline(cin, phoneNumber);
             if (!isValidPhone(phoneNumber))
             {
-                cout << "Invalid phone number!\n";
+                cout << BOLD << RED << "Invalid phone number!\n"
+                     << RESET;
                 continue;
             }
 
@@ -940,40 +1034,45 @@ int main()
                 newUser = new Admin(username, password, email, fullName, phoneNumber);
                 break;
             default:
-                cout << "Invalid user type!\n";
+                cout << BOLD << RED << "Invalid user type!\n"
+                     << RESET;
                 continue;
             }
 
             newUser->saveToFile();
-            cout << "Registration successful!\n";
+            cout << BOLD << GREEN << "Registration successful!\n"
+                 << RESET;
             delete newUser;
         }
         else if (choice == 2)
         {
-            cout << "\n=== Login ===\n";
+            cout << BOLD << CYAN << "\n=== Login ===\n"
+                 << RESET;
             string username, password;
 
-            cout << "Enter username: ";
+            cout << BOLD << YELLOW << "Enter username: " << RESET;
             getline(cin, username);
-            cout << "Enter password: ";
+            cout << BOLD << YELLOW << "Enter password: " << RESET;
             getline(cin, password);
 
             User *user = User::login(username, password);
             if (user)
             {
-                cout << "Login successful!\n";
+                cout << BOLD << GREEN << "Login successful!\n"
+                     << RESET;
 
                 if (Buyer *buyer = dynamic_cast<Buyer *>(user))
                 {
                     while (true)
                     {
-                        cout << "\n=== Buyer Menu ===\n";
-                        cout << "1. View All Products\n"
+                        cout << BOLD << CYAN << "\n=== Buyer Menu ===\n"
+                             << RESET;
+                        cout << BOLD << YELLOW << "1. View All Products\n"
                              << "2. Place Order\n"
                              << "3. View Products by Category\n"
                              << "4. My Orders\n"
                              << "5. Logout\n"
-                             << "Choose an option: ";
+                             << "Choose an option: " << RESET;
 
                         int buyerChoice;
                         cin >> buyerChoice;
@@ -981,7 +1080,8 @@ int main()
                         {
                             cin.clear();
                             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                            cout << "Invalid input! Please enter a valid number.\n";
+                            cout << BOLD << RED << "Invalid input! Please enter a valid number.\n"
+                                 << RESET;
                             continue;
                         }
                         cin.ignore();
@@ -995,15 +1095,16 @@ int main()
                             string productName;
                             int quantity;
 
-                            cout << "Enter product name: ";
+                            cout << BOLD << YELLOW << "Enter product name: " << RESET;
                             getline(cin, productName);
-                            cout << "Enter quantity: ";
+                            cout << BOLD << YELLOW << "Enter quantity: " << RESET;
                             cin >> quantity;
                             if (cin.fail())
                             {
                                 cin.clear();
                                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                                cout << "Invalid input! Please enter a valid number.\n";
+                                cout << BOLD << RED << "Invalid input! Please enter a valid number.\n"
+                                     << RESET;
                                 continue;
                             }
                             cin.ignore();
@@ -1012,12 +1113,13 @@ int main()
                         }
                         else if (buyerChoice == 3)
                         {
-                            cout << "\nSelect a category:\n"
-                                 << "1. Electronics\n"
+                            cout << BOLD << CYAN << "\nSelect a category:\n"
+                                 << RESET
+                                 << BOLD << YELLOW << "1. Electronics\n"
                                  << "2. Clothing\n"
                                  << "3. Home\n"
                                  << "4. Books\n"
-                                 << "Choose a category: ";
+                                 << "Choose a category: " << RESET;
 
                             int categoryChoice;
                             cin >> categoryChoice;
@@ -1025,7 +1127,8 @@ int main()
                             {
                                 cin.clear();
                                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                                cout << "Invalid input! Please enter a valid number.\n";
+                                cout << BOLD << RED << "Invalid input! Please enter a valid number.\n"
+                                     << RESET;
                                 continue;
                             }
                             cin.ignore();
@@ -1046,7 +1149,8 @@ int main()
                                 selectedCategory = "Books";
                                 break;
                             default:
-                                cout << "Invalid category!\n";
+                                cout << BOLD << RED << "Invalid category!\n"
+                                     << RESET;
                                 continue;
                             }
 
@@ -1060,12 +1164,14 @@ int main()
 
                         else if (buyerChoice == 5)
                         {
-                            cout << "Logging out...\n";
+                            cout << BOLD << GREEN << "Logging out...\n"
+                                 << RESET;
                             break;
                         }
                         else
                         {
-                            cout << "Invalid choice! Try again.\n";
+                            cout << BOLD << RED << "Invalid choice! Try again.\n"
+                                 << RESET;
                         }
                     }
                 }
@@ -1073,14 +1179,15 @@ int main()
                 {
                     while (true)
                     {
-                        cout << "\n=== Seller Menu ===\n";
-                        cout << "1. Add Product\n"
+                        cout << BOLD << CYAN << "\n=== Seller Menu ===\n"
+                             << RESET;
+                        cout << BOLD << YELLOW << "1. Add Product\n"
                              << "2. Edit Product\n"
                              << "3. Delete Product\n"
                              << "4. View Listed Products\n"
                              << "5. View Dispatch Notifications\n"
                              << "6. Logout\n"
-                             << "Choose an option: ";
+                             << "Choose an option: " << RESET;
 
                         int sellerChoice;
                         cin >> sellerChoice;
@@ -1088,7 +1195,8 @@ int main()
                         {
                             cin.clear();
                             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                            cout << "Invalid input! Please enter a valid number.\n";
+                            cout << BOLD << RED << "Invalid input! Please enter a valid number.\n"
+                                 << RESET;
                             continue;
                         }
                         cin.ignore();
@@ -1100,15 +1208,15 @@ int main()
                             int quantity;
                             string category;
 
-                            cout << "Enter product name: ";
+                            cout << BOLD << YELLOW << "Enter product name: " << RESET;
                             getline(cin, productName);
-                            cout << "Enter price: ";
+                            cout << BOLD << YELLOW << "Enter price: " << RESET;
                             cin >> price;
-                            cout << "Enter quantity: ";
+                            cout << BOLD << YELLOW << "Enter quantity: " << RESET;
                             cin >> quantity;
                             cin.ignore();
 
-                            cout << "Select category (1. Electronics, 2. Clothing, 3. Home, 4. Books): ";
+                            cout << BOLD << YELLOW << "Select category (1. Electronics, 2. Clothing, 3. Home, 4. Books): " << RESET;
                             int categoryChoice;
                             cin >> categoryChoice;
                             cin.ignore();
@@ -1141,15 +1249,15 @@ int main()
                             int newQuantity;
                             string newCategory;
 
-                            cout << "Enter product name to edit: ";
+                            cout << BOLD << YELLOW << "Enter product name to edit: " << RESET;
                             getline(cin, productName);
 
-                            cout << "Enter new price: ";
+                            cout << BOLD << YELLOW << "Enter new price: " << RESET;
                             cin >> newPrice;
-                            cout << "Enter new quantity: ";
+                            cout << BOLD << YELLOW << "Enter new quantity: " << RESET;
                             cin >> newQuantity;
                             cin.ignore();
-                            cout << "Enter new category: ";
+                            cout << BOLD << YELLOW << "Enter new category: " << RESET;
                             getline(cin, newCategory);
 
                             seller->editProduct(productName, newPrice, newQuantity, newCategory);
@@ -1158,7 +1266,7 @@ int main()
                         {
                             string productName;
 
-                            cout << "Enter product name to delete: ";
+                            cout << BOLD << YELLOW << "Enter product name to delete: " << RESET;
                             getline(cin, productName);
 
                             seller->deleteProduct(productName);
@@ -1173,12 +1281,14 @@ int main()
                         }
                         else if (sellerChoice == 6)
                         {
-                            cout << "Logging out...\n";
+                            cout << BOLD << GREEN << "Logging out...\n"
+                                 << RESET;
                             break;
                         }
                         else
                         {
-                            cout << "Invalid choice! Try again.\n";
+                            cout << BOLD << RED << "Invalid choice! Try again.\n"
+                                 << RESET;
                         }
                     }
                 }
@@ -1186,14 +1296,23 @@ int main()
                 {
                     while (true)
                     {
-                        cout << "\n=== Admin Menu ===\n";
-                        cout << "1. View All Users\n"
+                        cout << BOLD << CYAN << "\n=== Admin Menu ===\n"
+                             << RESET;
+                        cout << BOLD << YELLOW << "1. View All Users\n"
                              << "2. View All Transactions\n"
                              << "3. Logout\n"
-                             << "Choose an option: ";
+                             << "Choose an option: " << RESET;
 
                         int adminChoice;
                         cin >> adminChoice;
+                        if (cin.fail())
+                        {
+                            cin.clear();
+                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                            cout << BOLD << RED << "Invalid input! Please enter a valid number.\n"
+                                 << RESET;
+                            continue;
+                        }
                         cin.ignore();
 
                         if (adminChoice == 1)
@@ -1206,32 +1325,34 @@ int main()
                         }
                         else if (adminChoice == 3)
                         {
-                            cout << "Logging out...\n";
+                            cout << BOLD << GREEN << "Logging out...\n"
+                                 << RESET;
                             break;
                         }
-
                         else
                         {
-                            cout << "Invalid choice! Try again.\n";
+                            cout << BOLD << RED << "Invalid choice! Try again.\n"
+                                 << RESET;
                         }
                     }
                 }
-
-                delete user;
             }
             else
             {
-                cout << "Invalid username or password.\n";
+                cout << BOLD << RED << "Invalid username or password!\n"
+                     << RESET;
             }
         }
         else if (choice == 3)
         {
-            cout << "Goodbye!\n";
+            cout << BOLD << CYAN << "Exiting the program...\n"
+                 << RESET;
             break;
         }
         else
         {
-            cout << "Invalid choice! Try again.\n";
+            cout << BOLD << RED << "Invalid choice! Try again.\n"
+                 << RESET;
         }
     }
 

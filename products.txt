@@ -1,3 +1,61 @@
-seller,mobile,60000,67,Electronics
-seller2,t-shirt,400.000000,27,Clothing
-seller,sneh,800.000000,0,Home
+seller2,realme book prime ,46000.000000,30,Electronics
+seller3,samsung s23 ultra,60000.000000,20,Electronics
+seller1,iphone 15 pro 128GB,120000.000000,50,Electronics
+seller4,t-shirt,400.000000,50,Clothing
+seller5,HC Verma,100.000000,100,Books
+seller6,chair,2000.000000,20,Home
+
+seller2,washing machine,25000.000000,15,Home
+seller2,air conditioner,30000.000000,10,Home
+seller2,LED TV,50000.000000,25,Electronics
+seller2,smartphone charger,1500.000000,50,Electronics
+seller2,denim jacket,2000.000000,20,Clothing
+seller2,sneakers,3000.000000,15,Clothing
+seller2,self-help book,350.000000,30,Books
+seller2,recipe book,500.000000,25,Books
+
+seller3,wireless earbuds,3000.000000,40,Electronics
+seller3,smartwatch,20000.000000,30,Electronics
+seller3,sofa cover,1000.000000,20,Home
+seller3,wall clock,1500.000000,25,Home
+seller3,t-shirt,700.000000,30,Clothing
+seller3,hoodie,1500.000000,15,Clothing
+seller3,children's,book,250.000000,40,Books
+seller3,travel guide,400.000000,20,Books
+
+seller1,laptop stand,1500.000000,70,Home
+seller1,blender,3000.000000,30,Home
+seller1,MacBook Air 13",100000.000000,35,Electronics
+seller1,tablet,35000.000000,20,Electronics
+seller1,silk shirt,2500.000000,40,Clothing
+seller1,leather jacket,5000.000000,10,Clothing
+seller1,classic novel,300.000000,50,Books
+seller1,graphic design book,1200.000000,30,Books
+
+seller4,jeans,800.000000,40,Clothing
+seller4,jacket,1500.000000,30,Clothing
+seller4,pillow,300.000000,25,Home
+seller4,storage box,500.000000,50,Home
+seller4,travel diary,250.000000,20,Books
+seller4,art supplies guide,400.000000,15,Books
+seller4,earphones,1000.000000,50,Electronics
+seller4,fitness tracker,2000.000000,20,Electronics
+
+seller5,programming book,500.000000,80,Books
+seller5,NCERT Class 12 Physics,150.000000,90,Books
+seller5,study chair,2000.000000,40,Home
+seller5,bookshelf,5000.000000,20,Home
+seller5,sweatshirt,900.000000,25,Clothing
+seller5,cotton shorts,600.000000,30,Clothing
+seller5,headphones,3000.000000,15,Electronics
+seller5,wireless mouse,800.000000,50,Electronics
+
+seller6,study desk,3500.000000,25,Home
+seller6,table lamp,1200.000000,40,Home
+seller6,cotton bedsheet,800.000000,50,Home
+seller6,air purifier,7000.000000,10,Electronics
+seller6,bluetooth speaker,2000.000000,25,Electronics
+seller6,formal trousers,1200.000000,20,Clothing
+seller6,leather belt,800.000000,30,Clothing
+seller6,dictionary,500.000000,20,Books
+seller6,math workbook,300.000000,40,Books

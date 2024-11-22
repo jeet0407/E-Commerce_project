@@ -1,4 +1,3 @@
-USERNAME,PASSWORD,GMAIL@gmail.com,ROLE,FULLNAME,PHONENO
 user,123456,seller6@gmail.com,seller,username,9825087550
 buyer,buyer,buyer@gmail.com,buyer,buyer,9725037884
 buyer1,buyer1,buyer1@gmail.com,buyer,buyer1,9125037884
@@ -13,3 +12,4 @@ seller5,seller5,seller5@gmail.com,seller,seller5,9250610205
 seller6,seller6,seller6@gmail.com,seller,selle6,9825087550
 seller7,seller7,seller7@gmail.com,seller,seller77,1234567890
 admin,admin,admin@gmail.com,admin,admin1,7600122547
+

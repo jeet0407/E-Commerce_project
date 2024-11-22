@@ -254,10 +254,6 @@ public:
         // Read each line (coupon) from the file
         while (getline(file, coupon))
         {
-            // Debugging statement: Print the coupon being read from the file and the entered coupon
-            cout << BOLD << CYAN << "Checking coupon: '" << coupon << "' against entered: '" << enteredCoupon << "'\n"
-                 << RESET;
-
             // Compare the entered coupon directly with the coupon from the file
             if (coupon == enteredCoupon)
             {
@@ -299,7 +295,7 @@ public:
 
         // Save transaction details to file
         ofstream transactionFile(TRANSACTIONS_FILE, ios::app);
-        transactionFile << "User," << productName << "," << quantity << "," << finalAmount << "," << time(0) << endl;
+        transactionFile << "Customer," << productName << "," << quantity << "," << finalAmount << "," << time(0) << endl;
         transactionFile.close();
     }
 
@@ -839,9 +835,9 @@ public:
                     hasTransactions = true;
 
                     cout << BOLD << GREEN << "User-persona: " << seller << "\n"
-                         << BOLD << GREEN << "Buyer: " << buyer << "\n"
-                         << BOLD << GREEN << "Product: " << product << "\n"
-                         << BOLD << GREEN << "Quantity: " << quantity << "\n"
+                         << BOLD << GREEN << "Prodcut name/Buyer: " << buyer << "\n"
+                         << BOLD << GREEN << "Quantity/Product: " << product << "\n"
+                         << BOLD << GREEN << "Price/Quantity: " << quantity << "\n"
                          << BOLD << GREEN << "Transaction At: " << ctime(&transactionTime)
                          << "----------------------------------------\n";
                 }

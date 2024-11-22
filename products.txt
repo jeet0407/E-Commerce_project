@@ -3,7 +3,7 @@ seller3,samsung s23 ultra,60000.000000,20,Electronics
 seller1,iphone 15 pro 128GB,120000.000000,50,Electronics
 seller4,t-shirt,400.000000,50,Clothing
 seller5,HC Verma,100.000000,100,Books
-seller6,chair,2000.000000,20,Home
+seller6,chair,2000.000000,18,Home
 seller2,washing machine,25000.000000,15,Home
 seller2,air conditioner,30000.000000,10,Home
 seller2,LED TV,50000.000000,25,Electronics

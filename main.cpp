@@ -838,11 +838,11 @@ public:
                     time_t transactionTime = stoul(timestamp);
                     hasTransactions = true;
 
-                    cout << "User-persona: " << seller << "\n"
-                         << "Buyer: " << buyer << "\n"
-                         << "Product: " << product << "\n"
-                         << "Quantity: " << quantity << "\n"
-                         << "Transaction At: " << ctime(&transactionTime)
+                    cout << BOLD << GREEN << "User-persona: " << seller << "\n"
+                         << BOLD << GREEN << "Buyer: " << buyer << "\n"
+                         << BOLD << GREEN << "Product: " << product << "\n"
+                         << BOLD << GREEN << "Quantity: " << quantity << "\n"
+                         << BOLD << GREEN << "Transaction At: " << ctime(&transactionTime)
                          << "----------------------------------------\n";
                 }
                 catch (const exception &e)
@@ -862,7 +862,7 @@ public:
 
         if (!hasTransactions)
         {
-            cout << "No transactions recorded yet.\n";
+            cout << RED << "No transactions recorded yet.\n";
         }
     }
 };

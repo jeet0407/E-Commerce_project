@@ -1,3 +1,0 @@
-
-buyer,mobile,1,1732087872,valsad
-buyer,mobile,1,1732088394,valsad
